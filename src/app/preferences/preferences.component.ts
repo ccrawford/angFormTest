@@ -12,30 +12,33 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class PreferencesComponent {
   preferences: any  = {};
+  scoreboxIP: string | null = null;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.route.queryParamMap.subscribe(params => {
-      const scoreboxIP = params.get('scoreboxIP');
-      // Check if scoreboxIP is null
-      if (scoreboxIP === null) {
-        console.error('scoreboxIP is null');
+      this.scoreboxIP = params.get('scoreboxIP');
+      if (this.scoreboxIP === null) {
+        console.log('scoreboxIP is null');  
         return;
       }
-      const url = `http://${scoreboxIP}/prefs`;
+      const url = `http://${this.scoreboxIP}/prefs`;
 
-    this.http.get(url).subscribe(
-      data => this.preferences = data,
-      error => console.error(error)
-    );
+      this.http.get(url).subscribe(
+        data => this.preferences = data,
+        error => console.error(error)
+      );
     });
   }
 
   onSubmit(formValues: any) {
     this.route.queryParamMap.subscribe(params => {
-      const scoreboxIP = params.get('scoreboxIP');
-      const url = `http://192.168.1.100/prefs`;
+      if (this.scoreboxIP === null) {
+        console.error('scoreboxIP in onSubmit is null');
+        return;
+      }
+      const url = `http://${this.scoreboxIP}/prefs`;
   
       this.http.post(url, formValues).subscribe(
         response => console.log(response),
